@@ -1,26 +1,38 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from 'react';
+import EquipmentMap from './components/EquipmentMap';
+import EquipmentDetails from './components/EquipmentDetails';
+import { fetchEquipmentData, fetchEquipmentPositionHistory, fetchEquipmentStateHistory, fetchEquipmentState } from './utils/api';
+import { Equipment, EquipmentStateHistory } from './types/equipment';
 
-function App() {
+const App: React.FC = () => {
+  const [selectedEquipment, setSelectedEquipment] = useState<Equipment | null>(null);
+  const [stateHistory, setStateHistory] = useState<EquipmentStateHistory[]>([]);
+  const [stateData, setStateData] = useState<any[]>([]); // Adjust the type based on your actual data
+
+  useEffect(() => {
+    const loadData = async () => {
+      const equipmentResponse = await fetchEquipmentData();
+      const positionResponse = await fetchEquipmentPositionHistory();
+      const stateHistoryResponse = await fetchEquipmentStateHistory();
+      const stateDataResponse = await fetchEquipmentState();
+
+      setStateHistory(stateHistoryResponse.data);
+      setStateData(stateDataResponse.data);
+    };
+
+    loadData();
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <EquipmentMap onEquipmentClick={setSelectedEquipment} />
+      <EquipmentDetails
+        equipment={selectedEquipment}
+        stateHistory={stateHistory}
+        stateData={stateData} // Pass the state data here
+      />
     </div>
   );
-}
+};
 
 export default App;
