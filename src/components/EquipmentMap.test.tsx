@@ -19,6 +19,7 @@ jest.mock('../utils/api', () => ({
 const mockEquipmentData = [
   { id: '1', name: 'Equipamento 1' },
   { id: '2', name: 'Equipamento 2' },
+  { id: '3', name: 'Equipamento 3' },
 ];
 
 const mockPositionHistory = [
