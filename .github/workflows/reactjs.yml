@@ -1,36 +1,38 @@
-name: Deploy React App to GitHub Pages
+name: Deploy React.js site to Pages
 
-# Dispara o fluxo de trabalho quando houver push na branch main ou manualmente
 on:
   push:
-    branches:
-      - main
+    branches: ["main"]
   workflow_dispatch:
 
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
+jobs:
+  build:
+    runs-on: ubuntu-latest
     steps:
-      # Passo 1: Checkout do código do repositório
-      - name: Checkout repository content
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Passo 2: Configura o Node.js na versão correta
-      - name: Setup Node.js environment
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: '16'
 
-      # Passo 3: Instala as dependências do projeto
       - name: Install dependencies
         run: npm install
 
-      # Passo 4: Gera o build de produção
-      - name: Build the project
+      - name: Build project
         run: npm run build
 
-      # Passo 5: Faz o deploy no GitHub Pages usando o gh-pages
+      - name: Configure Git
+        run: |
+          git config --global user.email "luizclovis2014@gmail.com"
+          git config --global user.name "Luiz-Santos2"
+
       - name: Deploy to GitHub Pages
         run: npm run deploy
         env:
