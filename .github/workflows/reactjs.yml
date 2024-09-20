@@ -33,10 +33,13 @@ jobs:
       - name: Build project
         run: npm run build
 
+      - name: List build directory (Debugging step)
+        run: ls -R ./build  # Verifica se a pasta de build está correta e contém os arquivos esperados
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./build
+          path: ./build  # Certifique-se de que este caminho corresponde à saída do seu build
 
   deploy:
     environment:
