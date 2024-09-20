@@ -1,71 +1,35 @@
-name: Deploy React.js site to Pages
+name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: ["main"]
-  workflow_dispatch:
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
+    branches:
+      - main  # Altere se sua branch principal for outra, como master
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Check out the repository
+        uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      # Configuração do Node.js (altere a versão conforme necessário)
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: "20"
-          cache: npm
+          node-version: '18'
 
+      # Instala as dependências do projeto
       - name: Install dependencies
         run: npm install
 
-      - name: Build project
-        run: |
-          npm run build 2>&1 | tee build-log.txt
-        continue-on-error: true  # Continua mesmo se o build falhar
+      # Executa o build do projeto
+      - name: Build the project
+        run: npm run build  # Altere conforme o comando de build do seu projeto
 
-      - name: Check if build folder exists (Debugging step)
-        run: |
-          if [ -d "./build" ]; then
-            echo "Build folder exists"
-          else
-            echo "Build folder does not exist. Check the build log for errors."
-            exit 1
-          fi
-
-      - name: List contents of build folder (Debugging step)
-        if: success()
-        run: |
-          echo "Listing contents of the build folder:"
-          ls -la ./build
-
-      - name: Output build log for debugging
-        if: always()  # Sempre mostre o log, independentemente do sucesso/falha
-        run: cat build-log.txt
-
-      - name: Upload artifact
-        if: success()  # Somente se o build for bem-sucedido
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./build
-
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
+      # Faz o deploy para o GitHub Pages
       - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v2
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist  # Altere conforme o diretório de saída do build
