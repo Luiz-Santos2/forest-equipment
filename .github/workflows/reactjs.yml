@@ -40,17 +40,18 @@ jobs:
           if [ -d "./build" ]; then
             echo "Build folder exists"
           else
-            echo "Build folder does not exist"
+            echo "Build folder does not exist. Check the build log for errors."
             exit 1
           fi
 
       - name: List contents of build folder (Debugging step)
+        if: success()
         run: |
           echo "Listing contents of the build folder:"
           ls -la ./build
 
       - name: Output build log for debugging
-        if: failure()  # Somente se a etapa de build falhar
+        if: always()  # Sempre mostre o log, independentemente do sucesso/falha
         run: cat build-log.txt
 
       - name: Upload artifact
@@ -58,7 +59,6 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./build
-        continue-on-error: true
 
   deploy:
     environment:
